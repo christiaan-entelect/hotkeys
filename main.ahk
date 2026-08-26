@@ -10,6 +10,12 @@ SetTitleMatchMode "RegEx"
 #HotIf GetKeyState("F13")
 r & h:: Reload
 e & h:: Edit
+#SuspendExempt True
+s:: {
+	Suspend()
+	TrayTip("Hotkeys", A_IsSuspended ? "Suspended" : "Active", 1000)
+}
+#SuspendExempt False
 #HotIf
 
 #Include Lib/Hotstrings.ahk ; Replaces what you type with something else.
