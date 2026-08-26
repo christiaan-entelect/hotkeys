@@ -38,3 +38,6 @@
 
 +CapsLock::CapsLock
 CapsLock::F13
+
+^+4::Send("+#s") ; Snipping tool
+^+v::Send("#v") ; Clipboard history
