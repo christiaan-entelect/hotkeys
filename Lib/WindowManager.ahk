@@ -4,12 +4,12 @@
 ; Lets you assign the active window to a letter/number "slot", persist those
 ; assignments across sessions, and jump back to them with hotkeys.
 ;
-; Hotkeys (Win = # modifier):
-;   Win+Shift+<key>  — Assign the foreground window to slot <key>
-;   Win+<key>        — Activate the last visited window in slot <key> (first on
+; Hotkeys (Alt = ! modifier):
+;   Alt+Shift+<key>  — Assign the foreground window to slot <key>
+;   Alt+<key>        — Activate the last visited window in slot <key> (first on
 ;                      first visit; memory is session-only, not persisted)
-;   Win+u            — Cycle forward through windows in the active slot
-;   Win+o            — Cycle backward through windows in the active slot
+;   Alt+u            — Cycle forward through windows in the active slot
+;   Alt+o            — Cycle backward through windows in the active slot
 ;
 ; Slots use single characters a–z and 0–9, except u and o (reserved for
 ; navigation). Slot contents are stored in Config/window-slots.ini.
@@ -26,17 +26,17 @@ for key in StrSplit("abcdefghijklmnopqrstuvwxyz0123456789") {
 }
 
 ; In-memory slot registry: slot key (string) → array of window handles (hwnd).
-; Each slot can hold multiple windows; Win+<key> recalls last visited, Win+u/o cycle.
+; Each slot can hold multiple windows; Alt+<key> recalls last visited, Alt+u/o cycle.
 windowSlots := Map()
 
-; Tracks which window index is "current" per slot when cycling with Win+u / Win+o.
+; Tracks which window index is "current" per slot when cycling with Alt+u / Alt+o.
 ; slot key → 1-based index into windowSlots[key].
 slotIndex := Map()
 
-; Last successfully activated hwnd per slot (reorder-safe recall for Win+<key>).
+; Last successfully activated hwnd per slot (reorder-safe recall for Alt+<key>).
 slotLastHwnd := Map()
 
-; The slot last assigned to or switched to; used for Win+u/o navigation.
+; The slot last assigned to or switched to; used for Alt+u/o navigation.
 activeSlot := ""
 
 ; ---------------------------------------------------------------------------
@@ -265,11 +265,11 @@ AssignHwndToSlot(key, hwnd, updateActiveSlot := false) {
 
 ; ---------------------------------------------------------------------------
 ; AssignToSlot(key, *)
-; Hotkey callback: Win+Shift+<key>.
+; Hotkey callback: Alt+Shift+<key>.
 ; Adds the active window to the given slot and saves. Scans all slots first and
 ; removes any existing reference to this window so each window lives in at
 ; most one slot at a time (including dedupe on re-assign to the same slot).
-; Sets activeSlot for subsequent Win+u/o cycling.
+; Sets activeSlot for subsequent Alt+u/o cycling.
 ; ---------------------------------------------------------------------------
 AssignToSlot(key, *) {
     AssignHwndToSlot(key, WinGetID("A"), true)
@@ -277,7 +277,7 @@ AssignToSlot(key, *) {
 
 ; ---------------------------------------------------------------------------
 ; SwitchToSlot(key, *)
-; Hotkey callback: Win+<key>.
+; Hotkey callback: Alt+<key>.
 ; Activates the last visited window in the slot (or first on first visit).
 ; No-op if the slot is empty or unknown.
 ; ---------------------------------------------------------------------------
@@ -291,7 +291,7 @@ SwitchToSlot(key, *) {
 
 ; ---------------------------------------------------------------------------
 ; NavigateSlot(direction, *)
-; Hotkey callback: Win+u (direction +1) or Win+o (direction -1).
+; Hotkey callback: Alt+u (direction +1) or Alt+o (direction -1).
 ; Cycles through windows in activeSlot, wrapping at the ends.
 ; If a handle no longer exists, that entry is removed and we try the next one
 ; (up to one full pass). Empty slots are deleted and persisted.
@@ -319,11 +319,11 @@ NavigateSlot(direction, *) {
 LoadSlots()
 
 ; Register hotkeys for every slot key.
-; $ prefix: hotkeys still fire when sent by the script; # = Win modifier.
+; $ prefix: hotkeys still fire when sent by the script; ! = Alt modifier.
 for key in SLOT_KEYS {
-    Hotkey("$#+" . key, AssignToSlot.Bind(key))  ; Win+Shift+<key> → assign
-    Hotkey("$#" . key, SwitchToSlot.Bind(key))   ; Win+<key> → switch
+    Hotkey("$!+" . key, AssignToSlot.Bind(key))  ; Alt+Shift+<key> -> assign
+    Hotkey("$!" . key, SwitchToSlot.Bind(key))   ; Alt+<key> -> switch
 }
 ; u/o are not slot keys; they navigate within the current slot.
-Hotkey("$#u", NavigateSlot.Bind(1))   ; Win+u → next window in slot
-Hotkey("$#o", NavigateSlot.Bind(-1))  ; Win+o → previous window in slot
+Hotkey("$!u", NavigateSlot.Bind(1))   ; Alt+u -> next window in slot
+Hotkey("$!o", NavigateSlot.Bind(-1))  ; Alt+o -> previous window in slot

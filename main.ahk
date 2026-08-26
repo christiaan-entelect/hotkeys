@@ -21,8 +21,6 @@ s:: {
 #Include Lib/Hotstrings.ahk ; Replaces what you type with something else.
 #Include Lib/ModesModal.ahk ; Modal hotkeys and scripts. See that file for explanation.
 #Include Lib/WindowManager.ahk
-#Include Lib/MacSwitch.ahk
-; #Include Lib/WindowSlotAutoAssign.ahk
 #Include Lib/WindowSlotsGUI.ahk
 #Include Lib/SpecificPrograms/Code.ahk
 #Include Lib/SpecificPrograms/Chrome.ahk
