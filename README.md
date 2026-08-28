@@ -23,17 +23,17 @@ Slots use letters and numbers. The letters `u` and `o` are reserved for cycling 
 
 | Shortcut | Action |
 | --- | --- |
-| `Win+Shift+key` | Assign the active window to `key`. A window can belong to only one slot. |
-| `Win+key` | Switch to the last visited window in `key`. |
-| `Win+u` | Move forward through the windows in the active slot. |
-| `Win+o` | Move backward through the windows in the active slot. |
+| `Alt+Shift+key` | Assign the active window to `key`. A window can belong to only one slot. |
+| `Alt+key` | Switch to the last visited window in `key`. |
+| `Alt+u` | Move forward through the windows in the active slot. |
+| `Alt+o` | Move backward through the windows in the active slot. |
 | `Win+/` | Open a list of assigned slots and their windows. Press `Esc` to close it. |
 
 ### Example
 
-1. Focus your browser and press `Win+Shift+b` to assign it to slot `b`.
-2. Focus your editor and press `Win+Shift+e` to assign it to slot `e`.
-3. Press `Win+b` to return to the browser or `Win+e` to return to the editor.
-4. Assign multiple windows to the same slot as needed, then use `Win+u` and `Win+o` to cycle through them.
+1. Focus your browser and press `Alt+Shift+b` to assign it to slot `b`.
+2. Focus your editor and press `Alt+Shift+e` to assign it to slot `e`.
+3. Press `Alt+b` to return to the browser or `Alt+e` to return to the editor.
+4. Assign multiple windows to the same slot as needed, then use `Alt+u` and `Alt+o` to cycle through them.
 
 Closed windows are removed automatically the next time the slot is used. To edit assignments manually, close the script first and update [`Config/window-slots.ini`](Config/window-slots.ini).
