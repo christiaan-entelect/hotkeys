@@ -45,7 +45,7 @@ activeSlot := ""
 ; Returns true on success, false if the handle is stale or invalid.
 ; ---------------------------------------------------------------------------
 ActivateHwnd(hwnd) {
-    if WinExist(hwnd) {
+    if IsAssignableTopLevelWindow(hwnd) {
         WinActivate(hwnd)
         return true
     }
@@ -146,7 +146,7 @@ LoadSlots() {
             if (val = "" || !RegExMatch(val, "^\d+$"))
                 break
             hwnd := Integer(val)
-            if WinExist(hwnd)
+            if IsAssignableTopLevelWindow(hwnd)
                 windows.Push(hwnd)
             i++
         }
@@ -233,10 +233,14 @@ IsWindowInAnySlot(hwnd) {
 
 ; ---------------------------------------------------------------------------
 ; IsAssignableTopLevelWindow(hwnd)
-; Returns true for live top-level windows that are not tool windows.
+; Returns true for live, visible top-level windows that are not tool windows.
+; Hidden helper windows (Default IME, OLEChannelWnd, Realtek, …) are rejected;
+; DetectHiddenWindows is on script-wide, so WinExist alone would accept them.
 ; ---------------------------------------------------------------------------
 IsAssignableTopLevelWindow(hwnd) {
     if !WinExist(hwnd)
+        return false
+    if !(WinGetStyle(hwnd) & 0x10000000)  ; WS_VISIBLE
         return false
     if (DllCall("GetParent", "Ptr", hwnd, "Ptr") != 0)
         return false
@@ -246,12 +250,32 @@ IsAssignableTopLevelWindow(hwnd) {
 }
 
 ; ---------------------------------------------------------------------------
+; PruneClosedWindows()
+; Drops every window handle that no longer exists from all slots, updating
+; memory and the INI file via RemoveFromSlot.
+; ---------------------------------------------------------------------------
+PruneClosedWindows() {
+    global windowSlots, SLOT_KEYS
+    for slotKey in SLOT_KEYS {
+        if !windowSlots.Has(slotKey)
+            continue
+        ; Iterate a copy because RemoveFromSlot mutates the slot's array.
+        for hwnd in windowSlots[slotKey].Clone() {
+            if !IsAssignableTopLevelWindow(hwnd)
+                RemoveFromSlot(slotKey, hwnd)
+        }
+    }
+}
+
+; ---------------------------------------------------------------------------
 ; AssignHwndToSlot(key, hwnd, updateActiveSlot := false)
-; Adds hwnd to the given slot and saves. Removes it from any other slot first.
+; Prunes closed windows from all slots, then adds hwnd to the given slot and
+; saves. Removes it from any other slot first.
 ; When updateActiveSlot is true, sets activeSlot (manual assign hotkey).
 ; ---------------------------------------------------------------------------
 AssignHwndToSlot(key, hwnd, updateActiveSlot := false) {
     global windowSlots, activeSlot, SLOT_KEYS
+    PruneClosedWindows()
     for slotKey in SLOT_KEYS
         RemoveFromSlot(slotKey, hwnd)
     if !windowSlots.Has(key)
@@ -272,7 +296,11 @@ AssignHwndToSlot(key, hwnd, updateActiveSlot := false) {
 ; Sets activeSlot for subsequent Win+u/o cycling.
 ; ---------------------------------------------------------------------------
 AssignToSlot(key, *) {
-    AssignHwndToSlot(key, WinGetID("A"), true)
+    try
+        hwnd := WinGetID("A")
+    catch
+        return  ; no activatable window (e.g. desktop or taskbar has focus)
+    AssignHwndToSlot(key, hwnd, true)
 }
 
 ; ---------------------------------------------------------------------------

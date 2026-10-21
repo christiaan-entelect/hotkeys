@@ -36,6 +36,6 @@ Slots use letters and numbers. The letters `u` and `o` are reserved for cycling 
 3. Press `Win+b` to return to the browser or `Win+e` to return to the editor.
 4. Assign multiple windows to the same slot as needed, then use `Win+u` and `Win+o` to cycle through them.
 
-Closed windows are removed automatically the next time the slot is used. To edit assignments manually, close the script first and update [`Config/window-slots.ini`](Config/window-slots.ini).
+Closed windows are removed automatically the next time the slot is used, and every time any window is assigned to a slot (manually or automatically), all slots are checked and closed windows are dropped. To edit assignments manually, close the script first and update [`Config/window-slots.ini`](Config/window-slots.ini).
 
 >### Note: The `master` branch includes my personal hotkeys as well, for only the window manager, use the `window-manager-only` branch
